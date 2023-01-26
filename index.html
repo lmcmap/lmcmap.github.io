@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>LMC Map</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+	
+	<link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+	<script src="https://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+	<script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
+	<script src="us-states.js"></script>
+
+	<style>
+	
+		html, body, .main {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+		}
+		body {background-color: #000;}
+		.main {
+			opacity: 0.3;
+			position: absolute;
+			animation: changeBg 10s infinite; 
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+		}	
+		.headBlock {
+			width: 30%;
+			padding-left: 2%;
+		}				
+		.headlogo {
+			width: 70%;
+			background-color: white;
+			opacity: 0.9;
+			display: flex;
+			flex-wrap: wrap;
+			align-content: center;
+			justify-content: center;
+			align-items: center;
+			flex-direction: row;
+		}		
+		.p-logo {
+			opacity: 0.9;
+			width: 15%;
+			padding: 5px;
+		}		
+		@keyframes changeBg{
+		   0%,100%  {background-image: url("./img/f1.jpg");}
+		   25% {background-image: url("./img/f2.jpg");}
+		   50% {background-image: url("./img/f3.jpg");}
+		   75% {background-image: url("./img/f4.jpg");}
+		}		
+		#map {
+			top: 12%;
+			background: transparent;
+			height: 88%;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+		}			
+		.lmc-logo {
+			bottom: 0.5%;
+			width: 10vw;
+			left: 0.5%;
+			position: absolute;
+			pointer-events: none;
+			z-index: 999;
+		}
+		.header{
+			height: 12%;
+			line-height: 1;
+			display: flex;
+			top: 0;
+			width: 100%;
+			position: absolute;
+			border-top: 5px solid black;
+			border-bottom: 5px solid black;
+			pointer-events: none;
+			z-index: 999;
+			font-weight: bold;
+			font-size: 2.4em;
+			font-family: roboto;
+			background-color: #171714;
+			flex-direction: row;
+			justify-content: space-between;
+		}		
+		.hedOne {color: white; }
+		.hedTwo {color: #ffae00; }
+		.svgIcon {
+			fill: #ffae00;
+			stroke: #fff;
+			stroke-width: 3px;
+			
+		}
+		.leaflet-popup-content-wrapper {
+			padding: 0px;
+			text-align: left;
+			pointer-events: all;
+			
+		}
+		.leaflet-popup-content {
+			padding: 0px 0px 0px;
+			margin: 0;
+			line-height: inherit;
+			width: 30vw !important;
+		}
+		.leaflet-popup-content p {
+			margin: 0 !important;
+			text-align: center;
+		}
+		.leaflet-container a.leaflet-popup-close-button {
+			color: #ffffff;
+			font-weight: bold;
+		}
+		.popupBox {
+			font-family: helvetica;
+			display: inline-block;
+			margin-bottom: 10px;
+			width: 30vw;
+			
+		}
+		.popupBox .photo {
+			width: 95%;
+			margin-left: 5px;
+		}
+		.titleBox {
+			background-color: #141414;
+			width: 100%;
+			padding: 4px 0px 0px 0px;
+			font-size: 14pt;
+			text-align: center;
+		}
+		.leaflet-container a {
+			color: #cf9000;
+		}		
+		.leaflet-container a:hover {
+			color: #cf9000;
+		}
+		.leaflet-container  a:visited {
+			color: #cf9000;
+		}
+		.st5 {
+			fill: #fff;
+			font-family: roboto;
+		}
+		.st8, .st9 {
+			font-size: 10px !important;
+		}
+		.titleBoxText {
+			font-size: 14px;
+			font-weight: 600;
+			text-align: center;
+			margin: 5px 5px 5px 10px;
+			letter-spacing: .010em;
+		}				
+		@media only screen and (max-width: 768px) {
+			.popupBox {width: 50vw !important;}
+			.leaflet-popup-content {width: 50vw !important;}
+			.titleBox {height: fit-content;width: 100%;font-size: 11pt;}
+			.lmc-logo {width: 20vw;}
+			.header {font-size: 1.7em;}
+		}
+		@media only screen and (min-width: 769px) and (max-width: 1024px) {
+			.popupBox {width: 30vw !important;}
+			.titleBox {justify-content: space-around;height: fit-content;width: 100%;}
+			
+		}				
+	</style>
+	
+</head>
+<body>
+	<div class='main'></div>
+	<div class='header'>
+		<div class="headBlock">
+			<div class="headText"><span class="hedOne">Our partners</span></br><span class="hedTwo">network</span></div>
+		</div>
+		<div class="headlogo">
+			<img class="p-logo" src="./img/murchisonlaw_logo.jpg"><img class="p-logo" src="./img/Deutsch_logo.jpg">
+			<img class="p-logo" src="./img/Kessler_logo.jpg"><img class="p-logo" src="./img/WickerSmith_logo.jpg">
+			<img class="p-logo" src="./img/Roetzel_logo.jpg"><img class="p-logo" src="./img/WadeClark_logo.jpg">
+		</div>
+	</div>
+	<div id='map'></div>
+	<img class="lmc-logo" src="./img/logo.png">
+
+
+<script>
+
+	const map = L.map('map', {
+		zoomControl: false,
+		zoomSnap: 0.2,
+	    minZoom: 2,
+		maxZoom: 8
+	}); 
+	
+	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
+	
+	const latLngBounds = L.latLngBounds([[25.06, -122.86], [49.52, -68.68]]);	
+
+	L.tileLayer('https://api.mapbox.com/styles/v1/mturner0077/cldd2diwo000s01p27qe99yx6/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoibXR1cm5lcjAwNzciLCJhIjoiY2xkY3UybWtnMGFreTNwbXhsNzQ4cnl3ZSJ9.h-ZhBv8gaL1LChfZiF_-Yg', {
+			attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+	
+	const svgIcon = L.divIcon({
+		html:'<svg width="20" height="20" viewBox="0 0 40 40" version="1.1" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" ><circle cx="20" cy="20" r="18" /></svg>', 
+		className: "svgIcon", 
+		iconSize: [20, 20], 
+		iconAnchor: [10, 20],
+		popupAnchor: [0, -21]
+	});	
+
+	map.fitBounds(latLngBounds,{maxZoom : 5});
+	
+	let markers = L.markerClusterGroup({
+		showCoverageOnHover: false,
+		maxClusterRadius: 25,
+		spiderfyDistanceMultiplier: 1.5,
+		disableClusteringAtZoom: 8 
+	});   	
+
+	d3.csv('data.csv', function(data) {
+			for (let i = 0; i < data.length; i++) {
+				const feature = data[i];		
+				if (typeof feature.Lat !== "undefined") {
+					const latLng = new L.LatLng(feature.Lat, feature.Long);
+					const desc = '<div class="popupBox"><p class="titleBox" style="color: #fff;" title="'+  feature.Head + '" ><strong>'+  feature.Head + '</strong></p><p style="text-transform: uppercase;color: #ffb100;" title="'+  feature.Group +'" class="titleBox" >'+ feature.Group +'</p>\
+						<img class="photo" title="' + feature.Logo + '"  src="'  + feature.Logo + '">\
+						<p style="font-weight: bold;font-size: 12pt; text-align: center;"  title="'+  feature.Phone + '" >'+  feature.Phone + '</p>\
+						<p style="font-weight: bold;color: #cf9000;"  title="'+  feature.Email + '" >'+  feature.Email + '</p>\
+						<p style="font-weight: bold;"  title="'+  feature.Website +'" class="rowInfo"><a href="' + feature.Website + '" target="_blank"><b>' + feature.Website + '</b></a></p><hr>\
+						<p title="'+  feature.Address + '" class="rowInfo">'+  feature.Address + '</p></div>';					
+
+					var marker = new L.Marker (latLng,{icon: svgIcon}).bindPopup(desc);
+					markers.addLayer(marker);				
+				} else {
+					console.log('incorrect latlng');
+				}
+					
+			};	
+			map.addLayer(markers);
+	});
+
+	document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+		var tagName = event.target.tagName, popup = map._popup;
+		if (tagName === "IMG" && popup && !popup._updated) {
+			popup._updated = true; 
+			popup.update();
+		}
+	}, true);
+
+</script>
+
+
+
+</body>
+</html>
